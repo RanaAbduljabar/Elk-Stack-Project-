@@ -82,8 +82,8 @@ A summary of the access policies in place can be found in the table below.
 |----------|---------------------|----------------------|
 | Jump-Box-Provisioner | Yes                 | 20.213.27.80        |
 | ELKServer      | Yes                  |  20.89.168.220:5601        |
-| DVWA 1   | No                  |  10.0.0.1-254        |
-| DVWA 2   | No                  |  10.0.0.1-254        |
+| DVWA 1   | No                  |  10.1.0.5-254        |
+| DVWA 2   | No                  |  10.1.0.6-254        |
 
 
  
@@ -296,8 +296,8 @@ Then try to access web browser to http://<your.ELK-VM.External.IP>:5601/app/kiba
 ### Target Machines & Beats
 This ELK server is configured to monitor the following machines:
 
-- Web-1 (DVWA 1) | 10.0.0.5
-- Web-2 (DVWA 2) | 10.0.0.6
+- Web-1 (DVWA 1) | 10.1.0.5
+- Web-2 (DVWA 2) | 10.1.0.6
 
 I have installed the following Beats on these machines:
 
@@ -325,7 +325,7 @@ username: "elastic"
 password: "changeme"
 - Scroll to line #1806 and replace the IP address with the IP address of our ELK machine.
 	setup.kibana:
-host: "10.1.0.4:5601"
+host: "10.2.0.4:5601"
 - Save both files filebeat-config.yml and metricbeat-config.yml into `/etc/ansible/files/`
 
 ![files_FMconfig](https://github.com/Diablo5G/ELK-Stack-Project/blob/main/Resources/Images/files_FMconfig.png) 
@@ -458,7 +458,7 @@ To do so I used the following short script to automate 1000 failed SSH login att
 
 
 ```bash
-for i in {1..1000}; do ssh Web_1@10.0.0.5; done
+for i in {1..1000}; do ssh Web_1@10.1.0.5; done
 ```
 
 ![ssh failed attempts](https://github.com/Diablo5G/ELK-Stack-Project/blob/main/Resources/Images/ssh%20failed%20attempts.png)
@@ -511,7 +511,7 @@ while true; do for i in {5..6}; do ssh Web_1@10.0.0.$i; done
 
    - `{5..6}` creates a list of numbers (5 and 6), each of which will be given to our `i` variable.
 
-   - `ssh sysadmin@10.0.0.$i` is the command run by `do`. It is passing in the `$i` variable so the `wget` command will be run on each server, i.e., 10.0.0.5, 10.0.0.6 (Web-1, Web-2).
+   - `ssh sysadmin@10.0.0.$i` is the command run by `do`. It is passing in the `$i` variable so the `wget` command will be run on each server, i.e., 10.1.0.5, 10.1.0.6 (Web-1, Web-2).
 
 
 Next, I want to confirm that `metricbeat` is functioning. To do so I will run a linux stress test.
@@ -529,7 +529,7 @@ sudo docker start goofy_wright && sudo docker attach goofy_wright
 2. Then, SSH from my Ansible container to Web-1.
 
 ```bash
-ssh sysadmin@10.0.0.5
+ssh sysadmin@10.1.0.5
 ```
 
 3. Install the `stress` module with the following command:
@@ -566,7 +566,7 @@ This time we will generate a high amount of web requests directed to one of my w
         ssh sysadmin@<jump-box-provisioner>
      ``` 
 
-2. We need to add a new firewall rule to allow my Jump Box (10.0.0.4) to connect to my web servers over HTTP on port 80. To do so, I add a new Inbound Security Rule to Red-Team Network Security Group:
+2. We need to add a new firewall rule to allow my Jump Box (10.1.0.4) to connect to my web servers over HTTP on port 80. To do so, I add a new Inbound Security Rule to Red-Team Network Security Group:
 
 ![jump to http to webservers](https://github.com/Diablo5G/ELK-Stack-Project/blob/main/Resources/Images/jump%20to%20http%20to%20webservers.png)
 
@@ -574,7 +574,7 @@ This time we will generate a high amount of web requests directed to one of my w
 3. Run the following command to download the file `index.html` from Web-1 VM:
 
    - ```bash
-        wget 10.0.0.5
+        wget 10.1.0.5
      ```
 
 Output of the command:
@@ -593,7 +593,7 @@ Output of the command:
 5. Next, run the `wget` command in a loop to generate a very high number of web requests, I will use the `while` loop:
 
    - ```bash
-        while true; do wget 10.0.0.5; done
+        while true; do wget 10.1.0.5; done
      ```
 
 The result is that the `Load`, `Memory Usage` and `Network Traffic` were hit as seen below:
